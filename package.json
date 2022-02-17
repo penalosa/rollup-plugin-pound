@@ -1,22 +1,19 @@
 {
-  "name": "rollup-pound-plugin",
-  "version": "1.0.0",
-  "description": "Get rid of those pesky $ signs in your template strings! Replace them with the good old british £",
-  "main": "dist/rollup-pound-plugin.cjs.js",
-  "module": "dist/rollup-pound-plugin.es.js",
-  "files": [
-    "dist"
-  ],
+  "name": "rollup-plugin-pound",
+  "version": "2.0.0",
+  "description": "Get rid of those pesky $ signs in your template strings! Replace them with the good old british £, or any other currency symbol!",
+  "main": "src/index.js",
+  "module": "src/index.js",
   "keywords": [
     "rollup",
     "rollup-plugin"
   ],
-  "homepage": "https://github.com/penalosa/rollup-pound-plugin",
+  "homepage": "https://github.com/penalosa/rollup-plugin-pound",
   "author": "Samuel Macleod",
   "license": "MIT",
-  "repository": "penalosa/rollup-pound-plugin",
+  "repository": "penalosa/rollup-plugin-pound",
   "bugs": {
-    "url": "https://github.com/penalosa/rollup-pound-plugin/issues"
+    "url": "https://github.com/penalosa/rollup-plugin-pound/issues"
   },
   "scripts": {
     "prebuild": "rimraf -rf dist/*",
@@ -25,6 +22,7 @@
     "pretest": "npm run build"
   },
   "dependencies": {
+    "currency-symbol-map": "^5.0.1",
     "rollup-pluginutils": "^2.8.1"
   },
   "devDependencies": {

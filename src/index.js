@@ -1,5 +1,6 @@
+import getSymbolFromCurrency from 'currency-symbol-map'
 
-function getLexeme() {
+function getLexeme(templateSymbol) {
      return {
           text(value) {
                return {
@@ -7,10 +8,10 @@ function getLexeme() {
                     value
                }
           },
-          pound() {
+          currency() {
                return {
-                    type: 'pound',
-                    value: '£'
+                    type: 'currency',
+                    value: templateSymbol
                }
           },
           lbrace() {
@@ -34,12 +35,12 @@ function getLexeme() {
      }
 }
 
-function* lex(code) {
-     const lexeme = getLexeme()
+function* lex(code, templateSymbol) {
+     const lexeme = getLexeme(templateSymbol)
      let runningText = ''
      for (const char of code) {
           switch (char) {
-               case '£':
+               case templateSymbol:
                case '{':
                case '}':
                case '`':
@@ -48,8 +49,8 @@ function* lex(code) {
                          runningText = ''
                     }
                     switch (char) {
-                         case '£':
-                              yield lexeme.pound()
+                         case templateSymbol:
+                              yield lexeme.currency()
                               break
                          case '{':
                               yield lexeme.lbrace()
@@ -69,21 +70,53 @@ function* lex(code) {
      yield lexeme.text(runningText)
 }
 
-export default function poundPlugin() {
+export default function currencyPlugin({ currency = "GBP" } = { currency: "GBP" }) {
+     if (currency == "USD") {
+          throw new Error("No American dollars accepted here!")
+     }
+     let templateSymbol = getSymbolFromCurrency(currency) ?? '£'
 
      return {
-          name: 'pound-plugin',
+          name: 'currency-plugin',
 
           transform(code) {
                let transformed = ''
-               for (const lexeme of lex(code)) {
+               let nesting_stack = []
+               let last = null
+               for (const lexeme of lex(code, templateSymbol)) {
                     switch (lexeme.type) {
-                         case 'pound':
-                              transformed += '$'
+                         case 'currency':
+                              if (nesting_stack[nesting_stack.length - 1] == 'template') {
+                                   transformed += '$'
+                              } else {
+                                   transformed += lexeme.value
+                              }
+                              break
+                         case 'template':
+                              if (nesting_stack[nesting_stack.length - 1] == 'template') {
+                                   nesting_stack.pop()
+                              } else {
+                                   nesting_stack.push('template')
+                              }
+                              transformed += lexeme.value
+                              break
+
+                         case 'rbrace':
+                              if (nesting_stack[nesting_stack.length - 1] == 'lbrace') {
+                                   nesting_stack.pop()
+                              }
+                              transformed += lexeme.value
+                              break
+                         case 'lbrace':
+                              if (last?.type == 'currency' && nesting_stack[nesting_stack.length - 1] == 'template') {
+                                   nesting_stack.push('lbrace')
+                              }
+                              transformed += lexeme.value
                               break
                          default:
                               transformed += lexeme.value
                     }
+                    last = lexeme
                }
                return transformed
           },

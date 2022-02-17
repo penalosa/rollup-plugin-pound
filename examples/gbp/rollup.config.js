@@ -1,4 +1,4 @@
-import poundPlugin from '../src/index'
+import poundPlugin from '../../src/index'
 export default {
     input: 'index.js',
     output: {
