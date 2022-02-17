@@ -63,4 +63,4 @@ console.log(`Hello ${process.argv[2]}`);
 
 It goes without saying that `USD` isn't supported though—no need to transpile when you have native browser support!
 
-> No guarantees are provided as to whether currency symbols _not_ in template strings will be transpiled
+> No guarantees are provided as to whether currency symbols _not_ in template strings will be transpiled; an attempt is made, but Javascript is complicated 😂
